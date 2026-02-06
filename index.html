@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Proyecto</title>
+    <!-- Use v=6 to force CSS refresh -->
+    <link rel="stylesheet" href="style.css?v=6">
+    <link rel="stylesheet" href="calendar.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="config.js"></script>
+    <script src="google-api.js"></script>
+    <script src="app.js?v=6"></script>
+</head>
+
+<body>
+
+    <!-- Header Final Polish -->
+    <header class="header">
+        <div class="header-content">
+            <!-- LEFT: Logo + Controls Group -->
+            <div class="header-left">
+                <img src="logo.png" alt="THINK BARCELONA" class="brand-logo-img">
+
+                <div class="header-controls-group">
+                    <!-- Status -->
+                    <div id="connection-status" class="status disconnected control-btn">
+                        <span>🔴</span>&nbsp;OFFLINE
+                    </div>
+                    <!-- Connect Button -->
+                    <button id="connect-btn" class="btn btn-primary control-btn">CONECTAR</button>
+                    <!-- Disconnect Button -->
+                    <button id="disconnect-btn" class="btn btn-outline control-btn"
+                        style="display: none;">DESCONECTAR</button>
+
+                    <!-- Refresh Button (Square Icon) -->
+                    <button id="refresh-btn" class="control-btn-icon" title="Actualizar datos">🔄</button>
+                </div>
+            </div>
+
+            <!-- CENTER/RIGHT: Title -->
+            <div class="header-title-container">
+                <h1>CUADRO DE MANDO</h1>
+            </div>
+
+            <!-- Hidden spacer for balance if using flex-between -->
+            <div style="width: 100px;"></div>
+        </div>
+    </header>
+
+    <!-- KPIs Dashboard -->
+    <section class="kpis-section">
+        <!-- 1. Active Projects -->
+        <div class="kpi-card">
+            <div class="kpi-icon">🚀</div>
+            <div class="kpi-content">
+                <h3 id="kpi-active">0</h3>
+                <p>Proyectos Activos</p>
+            </div>
+        </div>
+
+        <!-- 2. Critical Projects -->
+        <div class="kpi-card critical">
+            <div class="kpi-icon">&#9888;</div>
+            <div class="kpi-content">
+                <h3 id="kpi-critical">0</h3>
+                <p>Proyectos Críticos</p>
+            </div>
+        </div>
+
+        <!-- 3. Billing -->
+        <div class="kpi-card">
+            <div class="kpi-icon">&#128182;</div>
+            <div class="kpi-content">
+                <h3 id="kpi-billing">€0</h3>
+                <p>Facturación Prevista</p>
+            </div>
+        </div>
+
+        <!-- 4. Status Distribution -->
+        <div class="kpi-card status-card" style="min-width: 300px; flex-grow: 1.5;">
+            <div class="kpi-content" style="width: 100%;">
+                <h4
+                    style="font-size: 0.75rem; color: #888; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #333; padding-bottom: 4px;">
+                    Estado de Proyectos</h4>
+                <div id="status-distribution-container" style="display: flex; flex-direction: column; gap: 6px;">
+                    <!-- Dynamic Bars -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Critical Alerts Visual Grid -->
+    <section id="critical-visuals-section"
+        style="max-width: 1400px; margin: 0 auto; padding: 0 20px 20px; display: none;">
+        <h3
+            style="color: var(--color-accent-red); margin-bottom: 15px; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+            ⚠️ ATENCIÓN REQUERIDA (PROYECTOS CRÍTICOS)
+        </h3>
+        <div id="critical-alerts-container"
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+            <!-- Dynamic Alert Cards -->
+        </div>
+    </section>
+
+    <!-- Stats Section: Team & Project Types -->
+    <!-- Grid to hold the two widgets side by side with equal height -->
+    <section id="stats-split-section"
+        style="max-width: 1400px; margin: 0 auto; padding: 0 20px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 20px; align-items: stretch;">
+        <div id="team-stats-container" style="height: 100%;"></div>
+        <div id="type-stats-container" style="height: 100%;"></div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="dashboard-content">
+
+        <!-- Tab Navigation (Filters/Tabs) -->
+        <nav class="tab-nav" style="display: flex; gap: 5px; margin-bottom: 20px;">
+            <button class="tab-btn active" data-view="projects">TIMELINE DE PROYECTOS</button>
+            <button class="tab-btn" data-view="calendar">CALENDARIO</button>
+            <button class="tab-btn" data-view="billing">FACTURACIÓN</button>
+        </nav>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay" style="display: none;">
+            <div class="spinner"></div>
+            <p>Cargando datos...</p>
+        </div>
+
+        <!-- Filters (Hidden) -->
+        <div class="filters-container" style="display:none;"></div>
+
+        <!-- Projects View (Timeline) -->
+        <section id="projects-section" class="dashboard-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>TIMELINE DE PROYECTOS</h2>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Ordenado por fecha de entrega 📅</span>
+            </div>
+
+            <div id="projects-container" class="projects-container">
+                <p class="no-data">Conecta con Google Sheets para cargar los proyectos</p>
+            </div>
+        </section>
+
+        <!-- Calendar View -->
+        <section id="calendar-section" class="dashboard-section" style="display: none;">
+            <div class="calendar-header">
+                <h2 id="calendar-month-title">MES AÑO</h2>
+            </div>
+            <div id="calendar-container" class="calendar-grid"></div>
+        </section>
+
+        <!-- Billing View -->
+        <section id="billing-section" class="dashboard-section" style="display: none;">
+            <h2>Previsión de Facturación</h2>
+            <div id="billing-container">
+                <p class="no-data">Cargando datos financieros...</p>
+            </div>
+        </section>
+
+        <!-- Legacy Critical Hidden -->
+        <section id="critical-section" style="display: none;"></section>
+
+    </main>
+
+    <!-- Modal for Project Details -->
+    <div id="project-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2 id="modal-project-title">Nombre del Proyecto</h2>
+                <span id="modal-status" class="status-badge">Estado</span>
+            </div>
+
+            <div class="modal-grid">
+                <div class="modal-info">
+                    <div class="info-group">
+                        <label>Cliente</label>
+                        <p id="modal-client">-</p>
+                    </div>
+                    <div class="info-group">
+                        <label>Marca</label>
+                        <p id="modal-brand">-</p>
+                    </div>
+                    <div class="info-group">
+                        <label>Responsable</label>
+                        <p id="modal-person">-</p>
+                    </div>
+                    <div class="info-group">
+                        <label>Fechas</label>
+                        <p id="modal-dates">-</p>
+                    </div>
+                </div>
+
+                <div class="modal-notes-section">
+                    <h3>Observaciones</h3>
+                    <p id="modal-notes" class="notes-text">-</p>
+                </div>
+            </div>
+
+            <!-- Visual Presentation Section -->
+            <div class="modal-presentation-section">
+                <h3>Visual / Presentación</h3>
+                <div id="modal-presentation-container" class="presentation-container"></div>
+                <div id="presentation-fallback"></div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
