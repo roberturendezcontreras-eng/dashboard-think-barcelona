@@ -13,7 +13,7 @@
 const CONFIG = {
     // Google API Configuration
     GOOGLE_CLIENT_ID: '54402589069-nhgmfjh461rcomg2o7n65uibkhm7oqm6.apps.googleusercontent.com',
-    GOOGLE_API_KEY: '', // Opcional, no necesario para lectura con OAuth
+    GOOGLE_API_KEY: 'AIzaSyD6UAp-i9Kdq1imEKbMLkK9knCFlXXG1tw', // Opcional, no necesario para lectura con OAuth
 
     // Scopes - Solo lectura para Google Sheets
     SCOPES: 'https://www.googleapis.com/auth/spreadsheets.readonly',
@@ -42,3 +42,4 @@ const CONFIG = {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = CONFIG;
 }
+
